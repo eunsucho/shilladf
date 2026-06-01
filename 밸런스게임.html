@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>내 취향은 Shilla! · 위젯 → 앱 연결</title>
+<style>
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css");
+:root{
+  --ink:#15151C; --ink-soft:#5A5A6B; --ink-mut:#9A9AA8; --line:#E6E7EC; --paper:#fff;
+  --orange:#F5611E; --orange-2:#FF7A3C; --orange-soft:#FDE7DA; --teal:#1AA79C; --indigo:#6B53D8; --pink:#E0518A;
+  --f:"Pretendard Variable","Pretendard",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--f); color:var(--ink); -webkit-font-smoothing:antialiased; line-height:1.6;
+  background:radial-gradient(60% 50% at 85% 4%, rgba(245,97,30,.08), transparent 60%), radial-gradient(55% 45% at 8% 8%, rgba(107,83,216,.08), transparent 62%), linear-gradient(180deg,#F2F3F7,#E6E9F0); min-height:100vh; padding:36px 24px 70px;}
+img{display:block; max-width:100%;}
+button{font-family:inherit;}
+
+.wrap{max-width:1040px; margin:0 auto;}
+.head{text-align:center; margin-bottom:26px;}
+.h-brand{display:inline-flex; align-items:center; gap:8px; font-weight:800; font-size:18px; letter-spacing:-.4px;}
+.h-brand .bb{width:28px; height:28px; border-radius:9px; background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px;}
+.h-sub{font-size:13px; color:var(--ink-mut); margin-top:8px;}
+
+.stage{display:grid; grid-template-columns:minmax(0,392px) minmax(0,1fr); gap:56px; align-items:center;}
+.phone-col{display:flex; flex-direction:column; align-items:center; gap:15px;}
+
+/* phone */
+.phone{position:relative; width:min(392px,94vw); aspect-ratio:392/824; border-radius:52px; padding:13px; background:linear-gradient(160deg,#26262E,#121218); box-shadow:0 50px 90px rgba(21,21,28,.36), inset 0 1px 1px rgba(255,255,255,.10);}
+.phone::before{content:""; position:absolute; top:18px; left:50%; transform:translateX(-50%); width:116px; height:30px; border-radius:99px; background:#0c0c10; z-index:60;}
+.p-side{position:absolute; left:-3px; top:128px; width:3px; height:46px; border-radius:3px; background:#2c2c34;}
+.p-side2{position:absolute; left:-3px; top:186px; width:3px; height:46px; border-radius:3px; background:#2c2c34;}
+.p-side3{position:absolute; right:-3px; top:158px; width:3px; height:74px; border-radius:3px; background:#2c2c34;}
+.screen{position:relative; height:100%; border-radius:40px; overflow:hidden;}
+
+/* OS home */
+.os{position:absolute; inset:0; display:flex; flex-direction:column; background:linear-gradient(170deg,#FFD9C4 0%,#F3C7E6 45%,#CBD5FF 100%);}
+.os-status{display:flex; align-items:center; justify-content:space-between; padding:15px 28px 4px; font-weight:700; font-size:13px; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.18); flex:none;}
+.os-status .rt{display:flex; gap:6px; font-size:11px;}
+.os-body{flex:1; padding:14px 20px 6px; display:flex; flex-direction:column; gap:18px; overflow:hidden;}
+.icons{display:grid; grid-template-columns:repeat(4,1fr); gap:16px 14px; align-content:start;}
+.ico{display:flex; flex-direction:column; align-items:center; gap:6px;}
+.ico .sq{width:54px; height:54px; border-radius:14px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:17px; box-shadow:0 4px 10px rgba(0,0,0,.14); cursor:pointer;}
+.ico .nm{font-size:10.5px; color:#fff; font-weight:600; text-shadow:0 1px 3px rgba(0,0,0,.3);}
+.ico.shilla .sq{background:linear-gradient(150deg,var(--orange),var(--orange-2));}
+.os-search{align-self:center; padding:7px 16px; border-radius:99px; background:rgba(255,255,255,.35); backdrop-filter:blur(8px); color:#fff; font-size:12px; font-weight:600; margin-top:auto;}
+.os-dock{flex:none; margin:10px 12px 14px; padding:13px; border-radius:30px; background:rgba(255,255,255,.32); backdrop-filter:blur(12px); display:flex; justify-content:space-around;}
+.os-dock .sq{width:54px; height:54px; border-radius:14px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:17px; box-shadow:0 4px 10px rgba(0,0,0,.14);}
+
+/* widget card */
+.sw{background:rgba(255,255,255,.96); border-radius:24px; box-shadow:0 14px 30px rgba(21,21,28,.16); overflow:hidden; backdrop-filter:blur(6px); cursor:pointer;}
+.sw-head{display:flex; align-items:center; gap:7px; padding:13px 14px 0;}
+.sw-logo{width:20px; height:20px; border-radius:6px; background:var(--orange); color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; flex:none;}
+.sw-ttl{font-size:11.5px; font-weight:800; letter-spacing:-.2px; flex:1;}
+.sw-day{font-size:10px; font-weight:700; color:var(--ink-mut);}
+.sw-q{font-weight:800; letter-spacing:-.4px; padding:9px 14px 11px; font-size:16px;}
+.sw-opts{display:flex; gap:8px; padding:0 14px 13px; align-items:stretch;}
+.sw-opt{flex:1; position:relative; border:none; padding:0; cursor:pointer; border-radius:13px; overflow:hidden; height:94px; background:linear-gradient(140deg,var(--g1,#888),var(--g2,#555)); box-shadow:0 6px 14px rgba(21,21,28,.14); transition:transform .16s;}
+.sw-opt:hover{transform:translateY(-2px);} .sw-opt:active{transform:scale(.97);}
+.sw-opt img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;} .sw-opt img.hide{display:none;}
+.sw-opt .sc{position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,0) 38%,rgba(0,0,0,.66));}
+.sw-opt .lb{position:absolute; left:9px; right:9px; bottom:8px; color:#fff; font-weight:800; font-size:12px; line-height:1.2; text-align:left; text-shadow:0 1px 5px rgba(0,0,0,.5);}
+.sw-vs{align-self:center; font-weight:800; font-size:10px; color:var(--ink-mut); flex:none;}
+.sw-foot{display:flex; align-items:center; justify-content:space-between; padding:0 14px 13px; font-size:10.5px; color:var(--ink-mut); font-weight:600;}
+.sw-foot .go{color:var(--orange); font-weight:800;}
+.sw-res{padding:11px 14px 14px;}
+.sw-res .rv{display:flex; align-items:baseline; gap:8px; margin-bottom:9px;}
+.sw-res .rv .pc{font-size:30px; font-weight:800; letter-spacing:-1.5px; color:var(--orange); line-height:1;}
+.sw-res .rv .vd{font-size:12.5px; font-weight:800;}
+.sw-res .sb{display:flex; height:30px; border-radius:9px; overflow:hidden; color:#fff; font-weight:800; font-size:11px;}
+.sw-res .sb .a{background:var(--orange); display:flex; align-items:center; padding-left:9px; white-space:nowrap; overflow:hidden;}
+.sw-res .sb .b{background:#C9C7C0; display:flex; align-items:center; justify-content:flex-end; padding-right:9px; white-space:nowrap; overflow:hidden;}
+.sw-res .rf{font-size:10.5px; color:var(--ink-soft); font-weight:600; margin-top:9px; display:flex; justify-content:space-between;}
+.sw-res .rf .go{color:var(--orange); font-weight:800;}
+
+/* ── APP LAYER (slides up over home) ── */
+.app-layer{position:absolute; inset:0; z-index:50; background:var(--paper); border-radius:40px; overflow:hidden; display:flex; flex-direction:column; transform:translateY(101%); transition:transform .5s cubic-bezier(.32,.72,0,1); box-shadow:0 -10px 40px rgba(0,0,0,.18);}
+.app-layer.open{transform:translateY(0);}
+.app-status{display:flex; align-items:center; justify-content:space-between; padding:15px 26px 4px; font-weight:700; font-size:13px; flex:none;}
+.app-status .rt{display:flex; gap:5px; font-size:11px;}
+.app-top{display:flex; align-items:center; gap:10px; padding:8px 18px 10px; flex:none; border-bottom:1px solid var(--line);}
+.app-brand{display:inline-flex; align-items:center; gap:7px; font-weight:800; font-size:15px; letter-spacing:-.3px; flex:1;}
+.app-brand .ab{width:24px;height:24px;border-radius:8px;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.app-chip{font-size:11px; font-weight:800; color:var(--ink-soft); background:#F1F0EC; padding:5px 11px; border-radius:99px;}
+.app-close{width:30px; height:30px; border-radius:50%; border:none; background:#F1F0EC; color:var(--ink); font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.2s;}
+.app-close:hover{background:#E4E2DC;}
+.app-body{flex:1; overflow-y:auto; padding:8px 22px 26px;}
+.app-body::-webkit-scrollbar{display:none;}
+.view{animation:vf .42s ease both;} @keyframes vf{from{opacity:0; transform:translateY(8px);}to{opacity:1;}}
+
+/* VOTE */
+.vote2{display:flex; flex-direction:column;}
+.v2-top{margin:2px 2px 16px;}
+.v2-eyebrow{font-size:11px; font-weight:800; letter-spacing:1.2px; color:var(--orange); text-transform:uppercase;}
+.v2-q{font-weight:800; font-size:23px; line-height:1.32; letter-spacing:-.5px; margin-top:9px;}
+.v2-split{position:relative; display:flex; flex-direction:column; gap:12px;}
+.v2-opt{position:relative; height:236px; border:none; padding:0; cursor:pointer; border-radius:20px; overflow:hidden; background:linear-gradient(140deg,var(--g1,#888),var(--g2,#555)); box-shadow:0 14px 30px rgba(21,21,28,.16); transition:transform .2s, box-shadow .2s;}
+.v2-opt:hover{transform:translateY(-3px); box-shadow:0 24px 44px rgba(21,21,28,.22);}
+.v2-opt:active{transform:scale(.99);}
+.v2-opt img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .6s cubic-bezier(.2,.7,.2,1);}
+.v2-opt img.hide{display:none;} .v2-opt:hover img{transform:scale(1.06);}
+.v2-scrim{position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.14) 0%,rgba(0,0,0,0) 30%,rgba(0,0,0,.68) 100%);}
+.v2-tag{position:absolute; top:14px; left:14px; font-size:11px; font-weight:700; letter-spacing:.4px; color:#fff; padding:4px 11px; border-radius:99px; background:rgba(0,0,0,.34); backdrop-filter:blur(5px);}
+.v2-label{position:absolute; left:16px; right:54px; bottom:15px; color:#fff; font-weight:800; font-size:20px; line-height:1.25; letter-spacing:-.4px; text-shadow:0 2px 10px rgba(0,0,0,.45);}
+.v2-go{position:absolute; right:14px; bottom:14px; width:34px; height:34px; border-radius:50%; background:#fff; color:var(--ink); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:15px; opacity:0; transform:translateY(6px); transition:.22s;}
+.v2-opt:hover .v2-go{opacity:1; transform:none;}
+.v2-vs{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:6; width:46px; height:46px; border-radius:50%; background:#fff; color:var(--ink); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; box-shadow:0 6px 18px rgba(0,0,0,.25), 0 0 0 5px var(--paper);}
+
+/* RESULT */
+.r2-eyebrow{font-size:11px; font-weight:800; letter-spacing:1.2px; color:var(--orange); text-transform:uppercase; margin-bottom:6px;}
+.r2-q{font-size:13px; color:var(--ink-mut); font-weight:600; margin-bottom:12px;}
+.r2-hero{text-align:center; padding:10px 0 2px;}
+.r2-pct{font-weight:800; font-size:74px; line-height:.92; letter-spacing:-3px;}
+.r2-pct span:last-child{font-size:30px;}
+.r2-verdict{display:inline-block; margin-top:12px; font-size:13px; font-weight:800; padding:8px 18px; border-radius:99px;}
+.r2-verdict.maj{background:var(--orange-soft); color:var(--orange);} .r2-verdict.min{background:#EBE7FB; color:var(--indigo);}
+.r2-gloss{font-size:12.5px; color:var(--ink-soft); margin-top:13px; line-height:1.5;} .r2-gloss b{color:var(--ink); font-weight:800;}
+.r2-split{margin-top:24px;}
+.r2-splitbar{display:flex; height:46px; border-radius:14px; overflow:hidden; color:#fff; font-weight:800; font-size:14px;}
+.r2-splitbar .sg{display:flex; align-items:center; transition:width 1s cubic-bezier(.2,.8,.2,1); white-space:nowrap; overflow:hidden; min-width:0;}
+.r2-splitbar .sg.a{justify-content:flex-start; padding-left:14px;} .r2-splitbar .sg.b{justify-content:flex-end; padding-right:14px;}
+.r2-splitlabels{display:flex; justify-content:space-between; margin-top:10px; font-size:12.5px; color:var(--ink-mut);}
+.r2-splitlabels span{display:flex; align-items:center; gap:6px;} .r2-splitlabels .win{font-weight:800; color:var(--ink);}
+.r2-mp{font-size:9px; font-weight:800; letter-spacing:.4px; color:#fff; background:var(--orange); padding:3px 8px; border-radius:99px;}
+.r2-nudge{display:flex; align-items:center; gap:13px; margin-top:24px; padding:14px 15px; border-radius:15px; background:linear-gradient(120deg,rgba(245,97,30,.08),rgba(107,83,216,.08)); border:1px solid rgba(245,97,30,.16);}
+.r2-ring{width:42px; height:42px; flex:none; border-radius:50%; background:conic-gradient(var(--orange) 0% 67%, rgba(0,0,0,.09) 67% 100%); display:flex; align-items:center; justify-content:center;}
+.r2-ring b{width:31px; height:31px; border-radius:50%; background:var(--paper); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; color:var(--orange);}
+.r2-nudge .nt{font-size:12.5px; color:var(--ink); line-height:1.5;} .r2-nudge .nt b{font-weight:800;} .r2-nudge .nt span{color:var(--ink-soft); font-size:11.5px;}
+.r2-div{height:1px; background:var(--line); margin-top:26px;}
+.r2-actions{display:flex; gap:10px; margin-top:24px;}
+.r2-actions button{flex:1; padding:14px; border-radius:14px; font-weight:800; font-size:14px; cursor:pointer; border:none; transition:.2s;}
+.r2-actions .sec{flex:0 0 38%; background:#F1F0EC; color:var(--ink);} .r2-actions .sec:hover{background:#E7E5DF;}
+.r2-actions .pri{background:var(--ink); color:#fff;} .r2-actions .pri:hover{background:var(--orange);}
+
+/* result: vs-average gauge */
+.r2-avg{margin-top:24px;}
+.r2-avg .at{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px; font-size:12px; font-weight:800;}
+.r2-avg .at .ar{color:var(--orange);}
+.r2-avg .gauge{position:relative; height:9px; border-radius:99px; background:linear-gradient(90deg, rgba(0,0,0,.06), rgba(245,97,30,.22));}
+.r2-avg .gauge .avg{position:absolute; left:50%; top:-5px; bottom:-5px; width:2px; background:var(--ink-mut); border-radius:2px;}
+.r2-avg .gauge .me{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:20px; height:20px; border-radius:50%; background:var(--orange); border:3px solid var(--paper); box-shadow:0 3px 9px rgba(0,0,0,.22); transition:left 1s cubic-bezier(.2,.8,.2,1);}
+.r2-avg .poles{display:flex; justify-content:space-between; margin-top:11px; font-size:10px; font-weight:700; color:var(--ink-mut);}
+.r2-avg .poles .c{color:var(--ink-soft);}
+
+/* shared sections + recommendation */
+.sec-lab{display:flex; align-items:center; gap:8px; margin:22px 0 11px;}
+.sec-lab .sl-k{font-size:11px; font-weight:800; letter-spacing:.8px; color:var(--ink-mut); text-transform:uppercase;}
+.sec-lab .sl-line{flex:1; height:1px; background:var(--line);}
+.rec-note{font-size:12px; color:var(--ink-soft); margin:-3px 0 12px; line-height:1.55;} .rec-note b{color:var(--ink); font-weight:700;}
+.rec-row{display:flex; gap:10px; overflow-x:auto; padding:0 4px 4px; margin:0 -4px;} .rec-row::-webkit-scrollbar{display:none;}
+.pitem{flex:none; width:118px;}
+.pitem .pthumb{position:relative; width:118px; height:118px; border-radius:14px; overflow:hidden; background:linear-gradient(140deg,var(--g1,#eee),var(--g2,#ccc)); box-shadow:0 6px 16px rgba(21,21,28,.08);}
+.pitem .pthumb img{width:100%; height:100%; object-fit:cover;} .pitem .pthumb img.hide{display:none;}
+.pitem .pcat{position:absolute; top:8px; left:8px; font-size:9px; font-weight:700; color:#fff; padding:3px 8px; border-radius:99px; background:rgba(0,0,0,.42); backdrop-filter:blur(3px);}
+.pitem .pn{font-weight:700; font-size:12.5px; line-height:1.35; margin-top:9px; letter-spacing:-.2px;}
+.pitem .pp{font-weight:800; font-size:12.5px; margin-top:3px;} .pitem .pp s{color:var(--ink-mut); font-weight:600; font-size:11px; margin-right:5px;}
+
+/* CARD */
+.card-eyebrow{text-align:center; font-size:11px; font-weight:800; letter-spacing:1.5px; color:var(--orange); text-transform:uppercase; margin-bottom:14px;}
+.tcard{position:relative; border-radius:20px; overflow:hidden; background:var(--paper); border:1px solid var(--line); box-shadow:0 22px 46px rgba(21,21,28,.14);}
+.tcard.shine::after{content:""; position:absolute; inset:0; z-index:6; pointer-events:none; background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.55) 50%,transparent 62%); transform:translateX(-130%); animation:shine 1.2s ease .35s 1 forwards;}
+@keyframes shine{to{transform:translateX(130%);}}
+.tcard-band{position:relative; min-height:188px; overflow:hidden; background:linear-gradient(135deg,#E89A6F,#D87BB0 55%,#8E73D6);}
+.tc-photo{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;} .tc-photo.hide{display:none;}
+.tc-band-scrim{position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.22) 0%, rgba(0,0,0,.04) 34%, rgba(0,0,0,.78) 100%);}
+.tc-band-top{position:absolute; top:14px; left:16px; right:16px; display:flex; justify-content:space-between; align-items:flex-start; z-index:2;}
+.tc-band-in{position:absolute; left:18px; right:18px; bottom:16px; z-index:2;}
+.tc-ed{font-size:10px; font-weight:800; letter-spacing:1px; color:#fff; text-shadow:0 1px 6px rgba(0,0,0,.5);}
+.tc-rare{font-size:10px; font-weight:800; letter-spacing:.5px; color:var(--ink); background:rgba(255,255,255,.92); padding:5px 11px; border-radius:99px; backdrop-filter:blur(4px);}
+.tc-label{font-size:10px; font-weight:700; letter-spacing:1.5px; color:rgba(255,255,255,.82);}
+.tc-type{font-weight:800; font-size:28px; line-height:1.15; letter-spacing:-.6px; margin-top:3px; color:#fff; text-shadow:0 2px 14px rgba(0,0,0,.5);}
+.tc-tagline{font-size:13px; font-weight:700; color:rgba(255,255,255,.92); margin-top:8px; letter-spacing:-.2px; text-shadow:0 1px 8px rgba(0,0,0,.4);}
+.tc-build{padding:16px 18px 2px;}
+.ticks{display:flex; gap:2px; align-items:flex-end; height:16px;}
+.ticks i{flex:1; height:100%; border-radius:2px; background:rgba(0,0,0,.09); transition:background .3s ease;}
+.ticks i.on{background:var(--orange);}
+.tc-build-cap{font-size:11px; color:var(--ink-mut); font-weight:700; margin-top:9px; text-align:center;}
+.tcard-axes{padding:18px;}
+.spec{margin-bottom:18px;} .spec:last-child{margin-bottom:0;}
+.spec-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px;}
+.spec-cat{font-size:12px; font-weight:800; color:var(--ink);} .spec-lean{font-size:12.5px; font-weight:800;}
+.spec-row{display:flex; align-items:center; gap:10px;}
+.spec-pole{font-size:10px; font-weight:700; color:var(--ink-mut); flex:none; width:56px; white-space:nowrap;} .spec-pole.r{text-align:right;}
+.spec-track{position:relative; flex:1; height:8px; border-radius:99px; background:rgba(0,0,0,.07);}
+.spec-track::before{content:""; position:absolute; left:50%; top:-4px; bottom:-4px; width:1px; background:rgba(0,0,0,.13);}
+.spec-dot{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:18px; height:18px; border-radius:50%; border:3px solid var(--paper); box-shadow:0 3px 9px rgba(0,0,0,.22); transition:left 1.05s cubic-bezier(.2,.8,.2,1); z-index:2;}
+.spec-avg{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:13px; height:13px; border-radius:50%; background:var(--paper); border:2px solid var(--ink-mut); z-index:1;}
+.spec-intro{font-size:12px; color:var(--ink-soft); line-height:1.55; margin-bottom:13px;} .spec-intro b{color:var(--ink); font-weight:800;}
+.spec-legend{display:flex; gap:16px; justify-content:flex-end; margin-bottom:16px; font-size:11px; font-weight:700; color:var(--ink-soft);}
+.spec-legend .lg{display:inline-flex; align-items:center; gap:6px;}
+.spec-legend .d{width:12px; height:12px; border-radius:50%;}
+.spec-legend .d.me{background:var(--orange);}
+.spec-legend .d.avg{background:var(--paper); border:2px solid var(--ink-mut);}
+.tcard-foot{display:flex; justify-content:space-between; align-items:center; padding:13px 18px; border-top:1px solid var(--line); font-size:10px; color:var(--ink-mut); letter-spacing:.5px;}
+.tcard-foot .sn{font-weight:800; color:var(--ink-soft);}
+.coll{margin-top:24px;}
+.coll-count{font-weight:800; font-size:11px; color:var(--orange); white-space:nowrap;}
+.coll-cards{display:flex; gap:9px; overflow-x:auto; padding:2px 2px 8px; margin:10px -2px 0;} .coll-cards::-webkit-scrollbar{display:none;}
+.coll-slot{flex:none; width:64px; height:86px; border-radius:13px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; position:relative;}
+.coll-slot.done{background:linear-gradient(150deg,#FFE2CF,#FFD0DE 55%,#E9D7FB); box-shadow:0 10px 20px rgba(245,97,30,.2); animation:slotpop .55s cubic-bezier(.2,1.2,.4,1) both;}
+@keyframes slotpop{from{opacity:0; transform:scale(.8);}to{opacity:1;}}
+.coll-slot .cm{font-weight:800; font-size:12px;} .coll-slot .cd{font-size:9px; font-weight:700;}
+.coll-slot.done .cm{color:var(--ink);} .coll-slot.done .cd{color:var(--ink-soft);}
+.coll-slot.done .chk{position:absolute; top:6px; right:6px; width:16px; height:16px; border-radius:50%; background:var(--orange); color:#fff; font-size:9px; display:flex; align-items:center; justify-content:center; font-weight:800;}
+.coll-slot.lock{background:#F2F1ED; border:1px dashed var(--line);} .coll-slot.lock .cm,.coll-slot.lock .cd{color:var(--ink-mut);}
+.coll-cap{font-size:11.5px; color:var(--ink-soft); line-height:1.6; margin-top:8px;}
+.insight{margin-top:14px; padding:14px 15px; border-radius:14px; background:linear-gradient(120deg, rgba(245,97,30,.10), rgba(224,81,138,.10)); border:1px solid rgba(245,97,30,.2);}
+.insight .ins-k{font-weight:800; font-size:10.5px; letter-spacing:1px; color:var(--orange); text-transform:uppercase;}
+.insight p{font-size:13.5px; line-height:1.55; margin-top:6px;} .insight p b{font-weight:800;}
+.coupon{position:relative; margin-top:12px; border-radius:16px; overflow:hidden; color:#fff; background:linear-gradient(120deg,#F5611E,#FF7A3C); box-shadow:0 16px 32px rgba(245,97,30,.26);}
+.coupon::before,.coupon::after{content:""; position:absolute; width:18px; height:18px; border-radius:50%; background:var(--paper); top:50%; transform:translateY(-50%);}
+.coupon::before{left:-9px;} .coupon::after{right:-9px;}
+.coupon .cp-in{display:flex; align-items:center; gap:14px; padding:16px 18px;}
+.coupon .cp-pct{font-weight:800; font-size:34px; line-height:1; letter-spacing:-1px; flex:none;} .coupon .cp-pct span{font-size:16px;}
+.coupon .cp-div{width:1px; align-self:stretch; border-left:1px dashed rgba(255,255,255,.6);}
+.coupon .cp-body b{font-size:13.5px; display:block;} .coupon .cp-body p{font-size:11px; opacity:.92; margin-top:3px; line-height:1.45;}
+.bridge{margin-top:12px; padding:14px; border-radius:14px; background:#fff; border:1px solid var(--line);}
+.bridge p{font-size:12px; color:var(--ink-soft); line-height:1.55; margin-bottom:10px;} .bridge p b{color:var(--ink); font-weight:700;}
+.bridge button{width:100%; padding:13px; border-radius:11px; border:1.5px solid var(--ink); background:transparent; color:var(--ink); font-weight:700; font-size:13.5px; cursor:pointer; transition:.2s;}
+.bridge button:hover{background:var(--ink); color:#fff;}
+
+.phone-cap{font-size:12.5px; color:var(--ink-mut); text-align:center; max-width:330px;}
+
+/* note */
+.note h2{font-size:23px; font-weight:800; letter-spacing:-.5px; margin-bottom:8px; line-height:1.35;}
+.note .lead{font-size:14px; color:var(--ink-soft); line-height:1.7; margin-bottom:22px;}
+.note-card{background:#fff; border:1px solid var(--line); border-left:3px solid var(--orange); border-radius:13px; padding:15px 18px; margin-bottom:13px;}
+.note-card .sn{font-size:11px; font-weight:800; color:var(--orange); letter-spacing:1px;}
+.note-card h4{font-weight:800; font-size:15px; letter-spacing:-.3px; margin:6px 0 6px;}
+.note-card p{font-size:13px; color:var(--ink-soft); line-height:1.6;} .note-card p b{color:var(--ink); font-weight:700;}
+
+@media (max-width:900px){
+  .stage{grid-template-columns:1fr; gap:30px;}
+  .note{max-width:440px; margin:0 auto; width:100%;}
+  .note h2{text-align:center; font-size:20px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div class="h-brand"><span class="bb">S</span> 내 취향은 Shilla!</div>
+    <div class="h-sub">홈 화면 위젯에서 탭하면 → 앱으로 이어져요</div>
+  </div>
+
+  <div class="stage">
+    <div class="phone-col">
+      <div class="phone">
+        <span class="p-side"></span><span class="p-side2"></span><span class="p-side3"></span>
+        <div class="screen">
+          <!-- OS HOME -->
+          <div class="os">
+            <div class="os-status"><span>9:41</span><span class="rt"><b>5G</b><b>100%</b></span></div>
+            <div class="os-body">
+              <div id="widgetZone"></div>
+              <div class="icons" id="icons"></div>
+              <div class="os-search">검색</div>
+            </div>
+            <div class="os-dock" id="dock"></div>
+          </div>
+          <!-- APP -->
+          <div class="app-layer" id="appLayer">
+            <div class="app-status"><span>9:41</span><span class="rt"><b>5G</b><b>100%</b></span></div>
+            <div class="app-top">
+              <div class="app-brand"><span class="ab">S</span> 내 취향은 Shilla!</div>
+              <span class="app-chip">1월 · 유럽</span>
+              <button class="app-close" id="appClose" title="홈으로">⌄</button>
+            </div>
+            <div class="app-body" id="appBody"></div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-cap" id="phoneCap">위젯의 선택지를 탭해보세요 — 앱이 열리면서 결과가 이어져요</div>
+    </div>
+
+    <div class="note">
+      <h2>위젯 한 번에서, 앱 안까지</h2>
+      <p class="lead">홈 화면 위젯은 떼어낸 조각이 아니라, 같은 경험의 입구예요. 가볍게 시작해서 자연스럽게 깊어지죠.</p>
+      <div class="note-card"><span class="sn">STEP 01</span><h4>홈에서 한 탭</h4><p>위젯에서 그날의 질문에 바로 투표. <b>앱을 찾을 필요도 없어요.</b></p></div>
+      <div class="note-card"><span class="sn">STEP 02</span><h4>앱이 스윽 열린다</h4><p>탭하는 순간 앱이 올라오며 <b>결과와 추천</b>이 펼쳐져요. 끊김 없이 이어지죠.</p></div>
+      <div class="note-card"><span class="sn">STEP 03</span><h4>취향이 쌓이고, 다시 홈으로</h4><p>카드가 채워지고 닫으면, <b>위젯도 '투표 완료'로 업데이트.</b> 내일 또 이어져요.</p></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── DATA ── */
+const QUESTIONS = [
+  { theme:"1월 · 유럽 EDITION", day:"1월·유럽", q:"파리에서 당신의 선택은?",
+    a:{tag:"관광", l:"에펠탑 인증샷", pct:41, img:"https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80&auto=format&fit=crop", g1:"#F5611E", g2:"#c23f0e"},
+    b:{tag:"로컬", l:"골목 카페", pct:59, img:"https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=800&q=80&auto=format&fit=crop", g1:"#C2954F", g2:"#8f6a2e"} },
+  { theme:"1월 · 유럽 EDITION", day:"1월·유럽", q:"런던의 밤, 어떻게 보낼까?",
+    a:{tag:"공연", l:"웨스트엔드 뮤지컬", pct:54, img:"https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80&auto=format&fit=crop", g1:"#6B53D8", g2:"#42329e"},
+    b:{tag:"펍", l:"펍에서 에일 한 잔", pct:46, img:"https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=800&q=80&auto=format&fit=crop", g1:"#C9863B", g2:"#92611f"} },
+  { theme:"1월 · 유럽 EDITION", day:"1월·유럽", q:"오늘 밤은 어디서 잘까?",
+    a:{tag:"럭셔리", l:"5성급 호텔 스위트", pct:62, img:"https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80&auto=format&fit=crop", g1:"#2E7FD8", g2:"#1c5aa8"},
+    b:{tag:"부티크", l:"감성 부티크 B&B", pct:38, img:"https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80&auto=format&fit=crop", g1:"#1AA79C", g2:"#127a6f"} },
+];
+const MILES = { 10:{t:"여행 스타일, 감 잡았어요"}, 20:{t:"숙소랑 식사 취향도 보이네요"}, 30:{t:"취향 카드 완성!"} };
+const PRODUCTS = [
+  { cat:"향수", n:"우디 시그니처 EDP 50ml", price:"₩128,000", was:"₩151,000", img:"https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&q=80&auto=format&fit=crop", g1:"#E8C9A0", g2:"#b88f5a" },
+  { cat:"주류", n:"12년 싱글몰트 위스키", price:"₩95,000", was:"₩112,000", img:"https://images.unsplash.com/photo-1569529465841-dfecdab9fee4?w=500&q=80&auto=format&fit=crop", g1:"#C98A3B", g2:"#8a5a1f" },
+  { cat:"패션", n:"아세테이트 선글라스", price:"₩210,000", was:"₩247,000", img:"https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500&q=80&auto=format&fit=crop", g1:"#6B7BD8", g2:"#3f4ca8" },
+];
+const COUPON = { pct:15, label:"럭셔리 보헤미안 전용", cond:"향수·주류 · 최대 3만원 · 5만원 이상" };
+const COLL = ["유럽","아시아","동남아","미주","중동","알프스","오세아니아","북유럽","남미","지중해","동유럽","아프리카"];
+const AXES = [
+  { cat:"여행 스타일", L:"계획", R:"즉흥", pos:78, avg:53, lean:"거의 즉흥파", c:"var(--orange)" },
+  { cat:"숙소", L:"가성비", R:"럭셔리", pos:84, avg:47, lean:"확실한 럭셔리파", c:"var(--teal)" },
+  { cat:"식사", L:"파인다이닝", R:"로컬 골목", pos:70, avg:58, lean:"골목 맛집파", c:"var(--indigo)" },
+  { cat:"쇼핑", L:"플렉스", R:"가성비", pos:64, avg:60, lean:"은근 알뜰파", c:"var(--pink)" },
+];
+const ICONS = [
+  {n:"카메라", c:"#2C2C2E", t:"카"}, {n:"메시지", c:"#34C759", t:"메"}, {n:"지도", c:"#4A90E2", t:"지"}, {n:"음악", c:"#FA2D48", t:"♪"},
+  {n:"사진", c:"linear-gradient(150deg,#FF6FB5,#FFB36B)", t:"사"}, {n:"날씨", c:"linear-gradient(160deg,#4AA3FF,#1C6FD6)", t:"날"}, {n:"시계", c:"#1A1A1C", t:"⏱"}, {n:"설정", c:"#8E8E93", t:"설"},
+  {n:"신라면세점", c:"", t:"S", shilla:true}, {n:"갤러리", c:"#7C6FF0", t:"갤"}, {n:"메모", c:"#FFCC33", t:"노"}, {n:"건강", c:"#FF4D6D", t:"건"},
+];
+const DOCK = [{c:"#34C759",t:"전"},{c:"#4A90E2",t:"B"},{c:"#3FA9F5",t:"@"},{c:"#2C2C2E",t:"카"}];
+
+let qi=0, choice=null, votes=9, votedQ0=false;
+const widgetZone=document.getElementById('widgetZone'), appBody=document.getElementById('appBody');
+const appLayer=document.getElementById('appLayer'), phoneCap=document.getElementById('phoneCap');
+
+/* ── helpers ── */
+function v2opt(o,i){ return `<button class="v2-opt" data-i="${i}" style="--g1:${o.g1};--g2:${o.g2}"><img src="${o.img}" alt="" loading="lazy" onerror="this.classList.add('hide')"/><span class="v2-scrim"></span><span class="v2-tag">${o.tag}</span><span class="v2-label">${o.l}</span><span class="v2-go">→</span></button>`; }
+function pitem(p){ return `<div class="pitem"><div class="pthumb" style="--g1:${p.g1};--g2:${p.g2}"><img src="${p.img}" alt="" loading="lazy" onerror="this.classList.add('hide')" /><span class="pcat">${p.cat}</span></div><div class="pn">${p.n}</div><div class="pp"><s>${p.was}</s>${p.price}</div></div>`; }
+function spec(a){ return `<div class="spec"><div class="spec-head"><span class="spec-cat">${a.cat}</span><span class="spec-lean" style="color:${a.c}">${a.lean}</span></div><div class="spec-row"><span class="spec-pole">${a.L}</span><span class="spec-track"><span class="spec-avg" style="left:${a.avg}%"></span><span class="spec-dot" data-pos="${a.pos}" style="background:${a.c}"></span></span><span class="spec-pole r">${a.R}</span></div></div>`; }
+function countUp(el,t){ if(!el)return; let c=0,s=Math.max(1,Math.round(t/26)); const iv=setInterval(()=>{c+=s; if(c>=t){c=t;clearInterval(iv);} el.textContent=c;},22); }
+
+/* ── OS home widget ── */
+function renderWidget(){
+  const q=QUESTIONS[0];
+  if(!votedQ0){
+    widgetZone.innerHTML = `<div class="sw" id="swCard">
+      <div class="sw-head"><span class="sw-logo">S</span><span class="sw-ttl">오늘의 여행 밸런스</span><span class="sw-day">${q.day}</span></div>
+      <div class="sw-q">${q.q}</div>
+      <div class="sw-opts">
+        <button class="sw-opt" data-i="0" style="--g1:${q.a.g1};--g2:${q.a.g2}"><img src="${q.a.img}" alt="" onerror="this.classList.add('hide')"/><span class="sc"></span><span class="lb">${q.a.l}</span></button>
+        <span class="sw-vs">VS</span>
+        <button class="sw-opt" data-i="1" style="--g1:${q.b.g1};--g2:${q.b.g2}"><img src="${q.b.img}" alt="" onerror="this.classList.add('hide')"/><span class="sc"></span><span class="lb">${q.b.l}</span></button>
+      </div>
+      <div class="sw-foot"><span>4,231명 참여 중</span><span class="go">탭해서 투표</span></div>
+    </div>`;
+    widgetZone.querySelectorAll('.sw-opt').forEach(b=> b.addEventListener('click', (e)=>{ e.stopPropagation(); choice=+b.dataset.i; qi=0; votes=10; votedQ0=true; openApp('result'); renderWidget(); }));
+    document.getElementById('swCard').addEventListener('click', ()=> openApp('vote'));
+  } else {
+    const pick=choice===0?q.a:q.b; const maj=pick.pct>=50; const other=choice===0?q.b:q.a;
+    widgetZone.innerHTML = `<div class="sw" id="swCard">
+      <div class="sw-head"><span class="sw-logo">S</span><span class="sw-ttl">오늘의 여행 밸런스</span><span class="sw-day">투표 완료</span></div>
+      <div class="sw-res">
+        <div class="rv"><span class="pc">${pick.pct}%</span><span class="vd" style="color:${maj?'var(--orange)':'var(--indigo)'}">${maj?'역시, 다수파!':'오, 소수파!'}</span></div>
+        <div class="sb"><span class="a" style="width:${pick.pct}%">${pick.l}</span><span class="b" style="width:${100-pick.pct}%">${other.l}</span></div>
+        <div class="rf"><span>10명 중 ${Math.round(pick.pct/10)}명이 당신 편</span><span class="go">앱에서 더 보기 ›</span></div>
+      </div>
+    </div>`;
+    document.getElementById('swCard').addEventListener('click', ()=> openApp('result'));
+  }
+}
+
+/* ── app open/close ── */
+function openApp(screen){
+  appLayer.classList.add('open');
+  if(screen==='vote'){ choice=null; renderVote(); phoneCap.textContent='앱이 열렸어요 · 둘 중 하나를 골라보세요'; }
+  else if(screen==='result'){ if(votes<10)votes=10; renderResult(); phoneCap.textContent='홈에서 던진 한 표가 앱에서 결과로 이어졌어요'; }
+  else if(screen==='card'){ votes=30; renderCard(); }
+}
+function closeApp(){ appLayer.classList.remove('open'); phoneCap.textContent = votedQ0 ? '투표 완료! 위젯도 결과로 바뀌었어요 — 다시 탭하면 앱으로' : '위젯의 선택지를 탭해보세요 — 앱이 열리면서 결과가 이어져요'; }
+document.getElementById('appClose').addEventListener('click', closeApp);
+
+/* ── app screens ── */
+function renderVote(){
+  const q=QUESTIONS[qi];
+  appBody.scrollTop=0;
+  appBody.innerHTML = `<div class="view vote2">
+    <div class="v2-top"><div class="v2-eyebrow">${q.theme} · 오늘의 밸런스</div><div class="v2-q">${q.q}</div></div>
+    <div class="v2-split">${v2opt(q.a,0)}<div class="v2-vs">VS</div>${v2opt(q.b,1)}</div>
+  </div>`;
+  appBody.querySelectorAll('.v2-opt').forEach(b=> b.addEventListener('click', ()=>{ choice=+b.dataset.i; if(votes<10)votes=10; if(qi===0)votedQ0=true; renderResult(); renderWidget(); }));
+}
+function renderResult(){
+  const q=QUESTIONS[qi]; const pick=choice===0?q.a:q.b; const maj=pick.pct>=50; const mile=MILES[votes]; const showRec=votes>=10;
+  const avgPos=Math.max(12,Math.min(88,Math.round(50+(50-pick.pct)*1.7)));
+  const avgRead=avgPos>56?'남들과 다른, 독특한 선택!':(avgPos<44?'꽤 무난한 선택이었어요':'딱 평균쯤이에요');
+  appBody.scrollTop=0;
+  appBody.innerHTML = `<div class="view res2">
+    <div class="r2-eyebrow">자, 결과 볼까요?</div>
+    <div class="r2-q">${q.q}</div>
+    <div class="r2-hero">
+      <div class="r2-pct" style="color:${maj?'var(--orange)':'var(--indigo)'}"><span id="cu">0</span><span>%</span></div>
+      <div class="r2-verdict ${maj?'maj':'min'}">${maj?'역시, 다수파예요':'오, 소수파네요 — 취향 독특한데요?'}</div>
+      <div class="r2-gloss">10명 중 <b>${Math.round(pick.pct/10)}명</b>이 당신과 같은 편이었어요</div>
+    </div>
+    <div class="r2-split">
+      <div class="r2-splitbar">
+        <span class="sg a" data-w="${q.a.pct}" style="width:50%;background:${choice===0?'var(--orange)':'#C9C7C0'}">${q.a.pct}%</span>
+        <span class="sg b" data-w="${q.b.pct}" style="width:50%;background:${choice===1?'var(--orange)':'#C9C7C0'}">${q.b.pct}%</span>
+      </div>
+      <div class="r2-splitlabels">
+        <span class="${choice===0?'win':''}">${q.a.l}${choice===0?'<span class="r2-mp">MY PICK</span>':''}</span>
+        <span class="${choice===1?'win':''}">${choice===1?'<span class="r2-mp">MY PICK</span>':''}${q.b.l}</span>
+      </div>
+    </div>
+    <div class="r2-avg">
+      <div class="at"><span>평균과 비교하면</span><span class="ar">${avgRead}</span></div>
+      <div class="gauge"><span class="avg"></span><span class="me" data-pos="${avgPos}"></span></div>
+      <div class="poles"><span>무난한 취향</span><span class="c">평균</span><span>독특한 취향</span></div>
+    </div>
+    <div class="r2-nudge">
+      <span class="r2-ring"><b>67%</b></span>
+      <span class="nt">${mile?`<b>${mile.t}</b> · 취향 카드 67% 완성<br><span>조금만 더 하면, 당신도 몰랐던 모습이 튀어나와요</span>`:`<b>취향이 쌓이는 중</b> · 67% 완성<br><span>조금만 더 하면, 당신도 몰랐던 모습이 튀어나와요</span>`}</span>
+    </div>
+    ${showRec?`<div class="r2-div"></div><div class="sec-lab"><span class="sl-k">유럽 여행자가 담은 PICK</span><span class="sl-line"></span></div><p class="rec-note">유럽에 끌리는 사람들, 이런 걸 슬쩍 담아가더라고요</p><div class="rec-row">${PRODUCTS.slice(0,2).map(pitem).join('')}</div>`:''}
+    <div class="r2-actions"><button class="sec" id="nextBtn2">다음 질문</button><button class="pri" id="cardBtn">취향 카드 보기</button></div>
+  </div>`;
+  requestAnimationFrame(()=> setTimeout(()=>{ const sa=appBody.querySelector('.sg.a'), sb=appBody.querySelector('.sg.b'); if(sa)sa.style.width=sa.dataset.w+'%'; if(sb)sb.style.width=sb.dataset.w+'%'; const me=appBody.querySelector('.r2-avg .me'); if(me)me.style.left=me.dataset.pos+'%'; }, 60));
+  countUp(document.getElementById('cu'), pick.pct);
+  document.getElementById('nextBtn2').onclick = ()=>{ qi=(qi+1)%QUESTIONS.length; choice=null; renderVote(); phoneCap.textContent='다음 질문도 한 번 골라볼까요?'; };
+  document.getElementById('cardBtn').onclick = ()=>{ votes=30; renderCard(); };
+}
+function renderCard(){
+  appBody.scrollTop=0;
+  appBody.innerHTML = `<div class="view card2">
+    <div class="card-eyebrow">짠, 이게 바로 당신이에요</div>
+    <div class="tcard shine">
+      <div class="tcard-band">
+        <img class="tc-photo" src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=900&q=80&auto=format&fit=crop" alt="" onerror="this.classList.add('hide')"/>
+        <span class="tc-band-scrim"></span>
+        <div class="tc-band-top"><span class="tc-ed">1월 · 유럽 EDITION</span><span class="tc-rare">유럽 · 럭셔리</span></div>
+        <div class="tc-band-in"><div class="tc-label">YOUR TRAVEL TYPE</div><div class="tc-type">럭셔리 보헤미안</div><div class="tc-tagline">“침대 부자, 골목 미식가”</div></div>
+      </div>
+      <div class="tc-build"><div class="ticks" id="ticks"></div><div class="tc-build-cap">30번 골랐더니, 이런 사람이 나왔어요</div></div>
+      <div class="tcard-axes"><div class="spec-intro">평균보다 취향이 또렷한 편 — 특히 <b>숙소</b>에서 확 갈려요</div><div class="spec-legend"><span class="lg"><span class="d me"></span>나</span><span class="lg"><span class="d avg"></span>평균</span></div>${AXES.map(spec).join('')}</div>
+      <div class="tcard-foot"><span class="sn">NO. 0312 / 2026</span><span>The Shilla Duty Free</span></div>
+    </div>
+    <div class="coll">
+      <div class="sec-lab"><span class="sl-k">내 취향 카드 컬렉션</span><span class="sl-line"></span><span class="coll-count">1 / 12 수집</span></div>
+      <div class="coll-cards">${COLL.map((r,i)=> i===0?`<div class="coll-slot done"><span class="chk">✓</span><span class="cm">1월</span><span class="cd">${r}</span></div>`:`<div class="coll-slot lock"><span class="cm">${i+1}월</span><span class="cd">${r}</span></div>`).join('')}</div>
+      <div class="coll-cap">다음 달엔 또 다른 여행지가 열려요. 한 장씩 모으는 재미가 쏠쏠하거든요.</div>
+    </div>
+    <div class="insight"><span class="ins-k">이런 건 몰랐죠?</span><p>잠은 최고급인데(럭셔리 80%) 끼니는 길거리(로컬 70%)라니. 이런 모순, 스스로도 몰랐죠? 당신은 <b>'침대 부자, 골목 미식가'</b>예요.</p></div>
+    <div class="sec-lab"><span class="sl-k">이런 거 좋아하죠?</span><span class="sl-line"></span></div>
+    <p class="rec-note">취향 보니까 감 왔어요 — <b>유럽</b> 갈 때 당신 같은 사람들이 꼭 담아가는 것들이에요</p>
+    <div class="rec-row">${PRODUCTS.map(pitem).join('')}</div>
+    <div class="sec-lab"><span class="sl-k">이건 보너스예요</span><span class="sl-line"></span></div>
+    <div class="coupon"><div class="cp-in"><div class="cp-pct">${COUPON.pct}<span>%</span></div><div class="cp-div"></div><div class="cp-body"><b>${COUPON.label} 쿠폰</b><p>${COUPON.cond}</p></div></div></div>
+    <div class="bridge"><p>면세 쇼핑은 <b>여행 갈 때</b>가 제일 좋잖아요. 지금 못 써도 괜찮아요 — 여행 일정을 등록하면 <b>출국일에 맞춰 쿠폰을 살려둘게요.</b></p><button id="tripBtn">여행 일정 등록하고 출국일에 받기</button></div>
+    <div class="r2-actions"><button class="sec" id="homeBtn">홈으로</button><button class="pri" id="shareBtn">친구에게 공유하기</button></div>
+  </div>`;
+  const ticks=document.getElementById('ticks');
+  for(let k=0;k<30;k++) ticks.appendChild(document.createElement('i'));
+  [...ticks.children].forEach((el,k)=> setTimeout(()=> el.classList.add('on'), 220 + k*15));
+  requestAnimationFrame(()=> appBody.querySelectorAll('.spec-dot').forEach((el,i)=> setTimeout(()=> el.style.left=el.dataset.pos+'%', 760 + i*150)));
+  document.getElementById('homeBtn').onclick = closeApp;
+  const sb=document.getElementById('shareBtn'); sb.onclick=()=>{ sb.textContent='링크 복사됨!'; setTimeout(()=>sb.textContent='친구에게 공유하기',1600); };
+  const tb=document.getElementById('tripBtn'); tb.onclick=()=>{ tb.textContent='출국일에 쿠폰을 보내드릴게요 ✓'; tb.style.background='var(--ink)'; tb.style.color='#fff'; };
+}
+
+/* ── build static chrome ── */
+document.getElementById('icons').innerHTML = ICONS.map(ic=> `<div class="ico ${ic.shilla?'shilla':''}" ${ic.shilla?'id="shillaIcon"':''}><div class="sq" ${ic.c?`style="background:${ic.c}"`:''}>${ic.t}</div><div class="nm">${ic.n}</div></div>`).join('');
+document.getElementById('dock').innerHTML = DOCK.map(d=> `<div class="sq" style="background:${d.c}">${d.t}</div>`).join('');
+document.getElementById('shillaIcon').addEventListener('click', ()=> openApp('vote'));
+
+renderWidget();
+</script>
+</body>
+</html>
