@@ -274,6 +274,19 @@
   .tiny-note{font-size:11px; color:var(--ink2); text-align:center; margin-top:10px; opacity:.85;}
   .speech{background:#fff; border-radius:18px; padding:13px 16px; margin:2px 8px 0; box-shadow:var(--shadow-s); font-size:14.5px; line-height:1.5;}
   .speech b{color:var(--coral-d);}
+
+  /* ---------- 알림 수신 동의 시트 ---------- */
+  .consent-overlay{position:fixed; inset:0; background:rgba(40,36,58,.5); z-index:80; display:flex; align-items:flex-end; justify-content:center; animation:fade .25s both;}
+  .consent-sheet{background:var(--cream); width:100%; max-width:560px; border-radius:24px 24px 0 0; padding:24px 22px calc(22px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px; animation:sheetup .32s ease both; box-shadow:0 -10px 40px rgba(40,36,58,.22);}
+  .consent-icon{width:62px; height:62px; border-radius:20px; display:grid; place-items:center; font-size:32px; background:linear-gradient(180deg,#FFE3D6,#FFD0BE); box-shadow:var(--shadow-s); margin-bottom:4px; animation:bobicon 2.4s ease-in-out infinite;}
+  .consent-title{font-family:var(--fd); font-size:20px; color:var(--ink); margin-top:4px;}
+  .consent-body{font-size:13.5px; line-height:1.6; color:var(--ink2); margin:2px 6px 6px; max-width:380px;}
+  .consent-list{list-style:none; padding:0; margin:6px 0 14px; width:100%; max-width:360px; display:flex; flex-direction:column; gap:8px;}
+  .consent-list li{display:flex; align-items:center; gap:10px; background:#fff; border-radius:14px; padding:11px 14px; box-shadow:var(--shadow-s); font-size:13px; color:var(--ink); text-align:left; line-height:1.45;}
+  .consent-list li .ci{font-size:18px; flex:0 0 auto;}
+  .consent-btns{width:100%; max-width:360px; display:flex; flex-direction:column; gap:9px;}
+  .consent-deny{font-family:var(--fb); font-weight:700; font-size:14px; color:var(--ink2); background:none; border:none; padding:6px; cursor:pointer;}
+  .consent-fine{font-size:11px; color:var(--ink2); opacity:.85; margin-top:2px;}
 </style>
 </head>
 <body>
@@ -428,9 +441,35 @@ function splash(){
   <div class="screen splash-hero">
     <img class="hero-img" src="assets/ui/splash_main.png" alt="시켜줘 명예비상구">
     <div class="hero-foot">
-      <button class="btn" onclick="toCreate()">구조 요청하기 ✈</button>
+      <button class="btn" onclick="askNotify()">구조 요청하기 ✈</button>
     </div>
   </div>`);
+}
+
+/* ----- 알림 수신 동의 (게임 시작 시) ----- */
+function askNotify(){
+  const ov=document.createElement('div');
+  ov.className='consent-overlay';
+  ov.innerHTML=`
+    <div class="consent-sheet" role="dialog" aria-modal="true" aria-label="알림 수신 동의">
+      <div class="consent-icon">🔔</div>
+      <div class="consent-title">알림을 받아볼까요?</div>
+      <p class="consent-body"><b>시켜줘, 명예 비상구</b>의 소식을 알림으로 보내드려요. 동의하면 더 알찬 여정을 함께할 수 있어요.</p>
+      <ul class="consent-list">
+        <li><span class="ci">🛫</span>새 공항(스테이지)이 열리면 가장 먼저 알려드려요</li>
+        <li><span class="ci">⏰</span>오늘의 스피드 퀴즈·출석 리마인더</li>
+        <li><span class="ci">🎟️</span>쿠폰·항공권 추첨 등 보상 소식</li>
+      </ul>
+      <div class="consent-btns">
+        <button class="btn" id="consentAgree">알림 수신 동의 ✓</button>
+        <button class="consent-deny" id="consentDeny">나중에 할게요</button>
+      </div>
+      <p class="consent-fine">* 프로토타입 — 실제 알림은 발송되지 않으며, 설정에서 언제든 변경할 수 있어요.</p>
+    </div>`;
+  document.body.appendChild(ov);
+  const done=(agreed)=>{ state.notifyOptIn=agreed; ov.remove(); toCreate(); };
+  ov.querySelector('#consentAgree').onclick=()=>done(true);
+  ov.querySelector('#consentDeny').onclick=()=>done(false);
 }
 
 /* ----- CREATE (캐릭터 매트릭스에 맞춰 직장인/학생 × 여/남) ----- */
